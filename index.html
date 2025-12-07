@@ -3,221 +3,93 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IoT AC Dashboard</title>
+  <title>IoT AC Dashboard (RTDB)</title>
   <style>
     :root{
-      --bg:#0f172a;
-      --panel:#111827;
-      --panel-2:#0b1220;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --accent:#22c55e;
-      --accent-2:#38bdf8;
-      --danger:#ef4444;
-      --border:rgba(255,255,255,.08);
-      --shadow:0 10px 30px rgba(0,0,0,.25);
-      --radius:16px;
+      --bg:#0f172a; --panel:#111827; --panel2:#0b1220;
+      --text:#e5e7eb; --muted:#9ca3af; --accent:#22c55e; --border:rgba(255,255,255,.08);
+      --radius:16px; --shadow:0 10px 30px rgba(0,0,0,.25);
     }
     *{box-sizing:border-box}
     body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-      background: radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent),
-                  radial-gradient(1200px 600px at 90% 10%, rgba(34,197,94,.12), transparent),
-                  var(--bg);
+      margin:0; padding:26px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(900px 500px at 10% -10%, rgba(34,197,94,.12), transparent),
+        radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,.12), transparent),
+        var(--bg);
       color:var(--text);
-      min-height:100vh;
-      padding:28px;
     }
-    header{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:18px;
-    }
-    .title{
-      display:flex; flex-direction:column; gap:4px;
-    }
-    h1{
-      font-size: clamp(20px, 3vw, 28px);
-      margin:0;
-      letter-spacing:.2px;
-    }
-    .subtitle{
-      color:var(--muted);
-      font-size:12px;
-    }
-    .container{
-      display:grid;
-      grid-template-columns: 1.1fr 1.4fr;
-      gap:18px;
-    }
-    @media (max-width: 980px){
-      .container{grid-template-columns: 1fr;}
-    }
+    header{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:14px;}
+    h1{margin:0; font-size:clamp(20px,3vw,28px)}
+    .sub{color:var(--muted); font-size:12px}
+
+    .container{display:grid; grid-template-columns: 1.1fr 1.4fr; gap:16px;}
+    @media (max-width: 980px){ .container{grid-template-columns:1fr;} }
+
     .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%),
-                  var(--panel);
-      border:1px solid var(--border);
-      border-radius: var(--radius);
-      padding:18px;
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%), var(--panel);
+      border:1px solid var(--border); border-radius:var(--radius);
+      padding:16px; box-shadow:var(--shadow);
     }
-    .panel h2{
-      margin:0 0 12px 0;
-      font-size:16px;
-      color:#f3f4f6;
-      letter-spacing:.2px;
-    }
+    .panel h2{margin:0 0 10px 0; font-size:16px}
 
-    /* Monitoring cards */
-    .metrics{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
+    .metrics{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    @media (max-width: 520px){ .metrics{grid-template-columns:1fr;} }
+    .metric{
+      background:var(--panel2); border:1px solid var(--border);
+      border-radius:12px; padding:12px; display:flex; justify-content:space-between; align-items:center;
     }
-    @media (max-width: 520px){
-      .metrics{grid-template-columns: 1fr;}
-    }
-    .metric-card{
-      background: var(--panel-2);
-      border:1px solid var(--border);
-      border-radius: 14px;
-      padding:14px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .metric-label{
-      color:var(--muted);
-      font-size:12px;
-    }
-    .metric-value{
-      font-size:28px;
-      font-weight:700;
-      letter-spacing:.3px;
-      display:flex;
-      align-items:baseline;
-      gap:6px;
-    }
-    .unit{
-      font-size:12px;
-      color:var(--muted);
-      font-weight:500;
-    }
+    .label{color:var(--muted); font-size:11px}
+    .value{font-size:28px; font-weight:700}
+    .unit{color:var(--muted); font-size:11px}
 
-    /* Control layout */
     .section{
-      padding:12px;
-      background: var(--panel-2);
-      border:1px solid var(--border);
-      border-radius:14px;
-      margin-bottom:12px;
+      background:var(--panel2); border:1px solid var(--border);
+      border-radius:12px; padding:12px; margin-bottom:10px;
     }
-    .grid-2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width: 680px){
-      .grid-2{grid-template-columns: 1fr;}
-    }
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    @media (max-width: 680px){ .grid2{grid-template-columns:1fr;} }
 
-    label{
-      display:block;
-      font-size:11px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    select, input[type="number"], input[type="text"]{
-      width:100%;
-      background:#0b1020;
-      border:1px solid var(--border);
-      color:var(--text);
-      padding:10px 10px;
-      border-radius:10px;
+    label{display:block; font-size:11px; color:var(--muted); margin-bottom:6px;}
+    select{
+      width:100%; background:#0b1020; color:var(--text);
+      border:1px solid var(--border); border-radius:10px; padding:10px;
       outline:none;
     }
-    select:focus, input:focus{
-      border-color: rgba(56,189,248,.45);
-      box-shadow: 0 0 0 3px rgba(56,189,248,.12);
-    }
 
-    /* Power buttons */
-    .power-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
+    .power-row{display:flex; gap:8px; flex-wrap:wrap;}
     .btn{
-      border:1px solid var(--border);
-      background:#0b1020;
-      color:var(--text);
-      padding:10px 14px;
-      border-radius:10px;
-      font-weight:600;
-      font-size:12px;
-      cursor:pointer;
+      background:#0b1020; color:var(--text);
+      border:1px solid var(--border); border-radius:10px;
+      padding:9px 12px; font-size:12px; font-weight:600; cursor:pointer;
       transition:.15s ease;
-      user-select:none;
     }
-    .btn:hover{transform: translateY(-1px)}
-    .btn:active{transform: translateY(0)}
-    .btn-on.active{
-      border-color: rgba(34,197,94,.55);
-      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
-      background: rgba(34,197,94,.08);
-    }
-    .btn-off.active{
-      border-color: rgba(239,68,68,.55);
-      box-shadow: 0 0 0 3px rgba(239,68,68,.12);
-      background: rgba(239,68,68,.08);
-    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.on.active{border-color:rgba(34,197,94,.55); background:rgba(34,197,94,.08)}
+    .btn.off.active{border-color:rgba(239,68,68,.55); background:rgba(239,68,68,.08)}
 
-    /* Submit area */
-    .actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      justify-content:flex-start;
-      flex-wrap:wrap;
-      margin-top:8px;
-    }
-    .btn-primary{
-      background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(34,197,94,.18));
-      border-color: rgba(255,255,255,.14);
-    }
-    .btn-secondary{
-      color:var(--muted);
-    }
-
-    /* Payload preview */
     pre{
-      margin:0;
-      background:#050814;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px;
-      font-size:11px;
-      color:#d1fae5;
-      overflow:auto;
+      background:#050814; border:1px solid var(--border);
+      border-radius:12px; padding:10px; margin:0;
+      font-size:11px; color:#d1fae5; overflow:auto;
     }
-    .tiny-muted{
-      font-size:10px;
-      color:var(--muted);
-      margin-top:6px;
+
+    .actions{display:flex; gap:8px; flex-wrap:wrap;}
+    .primary{background:linear-gradient(90deg, rgba(56,189,248,.18), rgba(34,197,94,.18))}
+    .status-pill{
+      font-size:10px; color:var(--muted);
+      border:1px solid var(--border); padding:4px 8px; border-radius:999px;
     }
   </style>
 </head>
-
 <body>
   <header>
-    <div class="title">
+    <div>
       <h1>Dashboard Monitoring & Control AC</h1>
-      <div class="subtitle">UI statis — siap dihubungkan ke ESP32/Firebase/REST/MQTT</div>
+      <div class="sub">Realtime Database (RTDB) + GitHub Pages</div>
     </div>
+    <div class="status-pill" id="connStatus">RTDB: connecting...</div>
   </header>
 
   <div class="container">
@@ -225,31 +97,23 @@
     <section class="panel">
       <h2>Monitoring</h2>
       <div class="metrics">
-        <div class="metric-card">
+        <div class="metric">
           <div>
-            <div class="metric-label">Suhu</div>
-            <div class="metric-value">
-              <span id="tempValue">--</span>
-              <span class="unit">°C</span>
-            </div>
+            <div class="label">Suhu</div>
+            <div class="value"><span id="tempValue">--</span> <span class="unit">°C</span></div>
           </div>
-          <div class="unit" id="tempStatus">waiting...</div>
+          <div class="unit" id="tempMeta">waiting...</div>
         </div>
-
-        <div class="metric-card">
+        <div class="metric">
           <div>
-            <div class="metric-label">Pressure</div>
-            <div class="metric-value">
-              <span id="pressValue">--</span>
-              <span class="unit">hPa</span>
-            </div>
+            <div class="label">Pressure</div>
+            <div class="value"><span id="pressValue">--</span> <span class="unit">hPa</span></div>
           </div>
-          <div class="unit" id="pressStatus">waiting...</div>
+          <div class="unit" id="pressMeta">waiting...</div>
         </div>
       </div>
-
-      <div class="tiny-muted">
-        *Nanti kamu bisa update nilai ini dari realtime listener Firebase/WS/HTTP.
+      <div class="sub" style="margin-top:8px;">
+        Path: <code>monitoring/suhu</code> & <code>monitoring/pressure</code>
       </div>
     </section>
 
@@ -260,13 +124,13 @@
       <div class="section">
         <label>POWER</label>
         <div class="power-row">
-          <button class="btn btn-on active" id="powerOnBtn" type="button">ON</button>
-          <button class="btn btn-off" id="powerOffBtn" type="button">OFF</button>
+          <button class="btn on active" id="powerOnBtn" type="button">ON</button>
+          <button class="btn off" id="powerOffBtn" type="button">OFF</button>
         </div>
       </div>
 
       <div class="section">
-        <div class="grid-2">
+        <div class="grid2">
           <div>
             <label for="modeSelect">MODE</label>
             <select id="modeSelect">
@@ -307,95 +171,119 @@
             <select id="tempIndexSelect"></select>
           </div>
         </div>
-
-        <div class="tiny-muted">
-          Mapping suhu: <b>index 0 = 14.0°C</b>, naik <b>step 0.5°C</b> (contoh index 1 = 14.5°C).
+        <div class="sub" style="margin-top:6px;">
+          Index 0=14.0°C, step 0.5°C.
         </div>
       </div>
 
       <div class="section">
         <label>Payload Preview</label>
         <pre id="payloadPreview">{}</pre>
-        <div class="tiny-muted">
-          Format ini bisa kamu kirim ke ESP32 atau simpan ke Firebase.
-        </div>
       </div>
 
       <div class="actions">
-        <button class="btn btn-primary" id="sendBtn" type="button">Kirim Control</button>
-        <button class="btn btn-secondary" id="resetBtn" type="button">Reset UI</button>
+        <button class="btn primary" id="sendBtn" type="button">Kirim Control</button>
+        <button class="btn" id="resetBtn" type="button">Reset UI</button>
+      </div>
+
+      <div class="sub" style="margin-top:8px;">
+        Path write: <code>control/ac</code>
       </div>
     </section>
   </div>
 
-  <script>
-    // ====== CONFIG SUHU INDEX ======
-    // Range dibuat 0..32 agar 14.0 s/d 30.0 (step 0.5)
+  <!-- Firebase RTDB (ESM) -->
+  <script type="module">
+    // Versi ESM dari CDN direkomendasikan untuk quick start. :contentReference[oaicite:9]{index=9}
+    const VERSION = "12.6.0";
+
+    import { initializeApp } from `https://www.gstatic.com/firebasejs/${VERSION}/firebase-app.js`;
+    import { getDatabase, ref, onValue, set, update } from `https://www.gstatic.com/firebasejs/${VERSION}/firebase-database.js`;
+
+    // ====== 1) GANTI CONFIG INI ======
+    // const firebaseConfig = {
+    //   apiKey: "YOUR_API_KEY",
+    //   authDomain: "YOUR_PROJECT.firebaseapp.com",
+    //   databaseURL: "https://YOUR_DB_NAME.asia-southeast1.firebasedatabase.app",
+    //   projectId: "YOUR_PROJECT_ID",
+    //   storageBucket: "YOUR_PROJECT.appspot.com",
+    //   messagingSenderId: "XXXX",
+    //   appId: "XXXX"
+    // };
+    const firebaseConfig = {
+      apiKey: "AIzaSyBh2T-GLXopRlv1uTcWXQvLt_iDJlnMsqo",
+      authDomain: "webiotdashboard.firebaseapp.com",
+      databaseURL: "https://webiotdashboard-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "webiotdashboard",
+      storageBucket: "webiotdashboard.firebasestorage.app",
+      messagingSenderId: "38054663986",
+      appId: "1:38054663986:web:d53a0ec9898609f013692b",
+      // measurementId: "G-STF6WDKYFB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // ====== UI ELEMENTS ======
+    const connStatus = document.getElementById("connStatus");
+
+    const tempValue = document.getElementById("tempValue");
+    const pressValue = document.getElementById("pressValue");
+    const tempMeta = document.getElementById("tempMeta");
+    const pressMeta = document.getElementById("pressMeta");
+
+    const powerOnBtn = document.getElementById("powerOnBtn");
+    const powerOffBtn = document.getElementById("powerOffBtn");
+    const modeSelect = document.getElementById("modeSelect");
+    const arahSelect = document.getElementById("arahSelect");
+    const speedSelect = document.getElementById("speedSelect");
+    const tempIndexSelect = document.getElementById("tempIndexSelect");
+    const payloadPreview = document.getElementById("payloadPreview");
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // ====== SUHU INDEX CONFIG ======
     const TEMP_MIN = 14.0;
     const TEMP_STEP = 0.5;
     const TEMP_MAX = 30.0;
     const MAX_INDEX = Math.round((TEMP_MAX - TEMP_MIN) / TEMP_STEP); // 32
 
-    // ====== ELEMENTS ======
-    const tempIndexSelect = document.getElementById("tempIndexSelect");
-    const modeSelect = document.getElementById("modeSelect");
-    const arahSelect = document.getElementById("arahSelect");
-    const speedSelect = document.getElementById("speedSelect");
-    const payloadPreview = document.getElementById("payloadPreview");
-
-    const powerOnBtn = document.getElementById("powerOnBtn");
-    const powerOffBtn = document.getElementById("powerOffBtn");
-
-    const sendBtn = document.getElementById("sendBtn");
-    const resetBtn = document.getElementById("resetBtn");
-
-    // Monitoring placeholders
-    const tempValue = document.getElementById("tempValue");
-    const pressValue = document.getElementById("pressValue");
-    const tempStatus = document.getElementById("tempStatus");
-    const pressStatus = document.getElementById("pressStatus");
-
-    // ====== STATE ======
-    let powerState = "on"; // default ON
-
-    // ====== BUILD TEMP INDEX OPTIONS ======
     function buildTempOptions() {
       tempIndexSelect.innerHTML = "";
       for (let i = 0; i <= MAX_INDEX; i++) {
-        const temp = (TEMP_MIN + i * TEMP_STEP).toFixed(1);
+        const t = (TEMP_MIN + i * TEMP_STEP).toFixed(1);
         const opt = document.createElement("option");
         opt.value = String(i);
-        opt.textContent = `${i} = ${temp}°C`;
+        opt.textContent = `${i} = ${t}°C`;
         tempIndexSelect.appendChild(opt);
       }
-      // default: set index yang nyaman, misal 24.0°C
-      const defaultIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
-      tempIndexSelect.value = String(Math.max(0, Math.min(MAX_INDEX, defaultIndex)));
+      const defIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
+      tempIndexSelect.value = String(defIndex);
     }
 
-    // ====== UI HELPERS ======
-    function setPower(state) {
+    // ====== STATE ======
+    let powerState = "on";
+
+    function setPowerUI(state) {
       powerState = state;
       powerOnBtn.classList.toggle("active", state === "on");
       powerOffBtn.classList.toggle("active", state === "off");
-      refreshPayload();
     }
 
-    function getTempByIndex(idx) {
-      const i = Number(idx);
-      return Number((TEMP_MIN + i * TEMP_STEP).toFixed(1));
+    function tempByIndex(i) {
+      return Number((TEMP_MIN + Number(i) * TEMP_STEP).toFixed(1));
     }
 
     function buildPayload() {
-      const tempIndex = Number(tempIndexSelect.value);
+      const idx = Number(tempIndexSelect.value);
       return {
         ac: {
-          power: powerState,               // "on" | "off"
-          mode: modeSelect.value,          // "dry" | "fan" | "auto" | "cool"
-          arah: arahSelect.value,          // "all" | "auto" | "5".."1"
-          kecepatan: speedSelect.value,    // "1".."4" | "auto" | "semilir"
-          suhu_index: tempIndex,           // integer
-          suhu_value: getTempByIndex(tempIndex) // float helper
+          power: powerState,
+          mode: modeSelect.value,
+          arah: arahSelect.value,
+          kecepatan: speedSelect.value,
+          suhu_index: idx,
+          suhu_value: tempByIndex(idx) // helper untuk UI
         }
       };
     }
@@ -405,53 +293,79 @@
     }
 
     function resetUI() {
-      setPower("on");
+      setPowerUI("on");
       modeSelect.value = "auto";
       arahSelect.value = "auto";
       speedSelect.value = "auto";
-      const defaultIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
-      tempIndexSelect.value = String(defaultIndex);
+      const defIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
+      tempIndexSelect.value = String(defIndex);
       refreshPayload();
     }
 
-    // ====== EVENT BINDINGS ======
-    powerOnBtn.addEventListener("click", () => setPower("on"));
-    powerOffBtn.addEventListener("click", () => setPower("off"));
-
+    // ====== UI EVENTS ======
+    powerOnBtn.addEventListener("click", () => { setPowerUI("on"); refreshPayload(); });
+    powerOffBtn.addEventListener("click", () => { setPowerUI("off"); refreshPayload(); });
     modeSelect.addEventListener("change", refreshPayload);
     arahSelect.addEventListener("change", refreshPayload);
     speedSelect.addEventListener("change", refreshPayload);
     tempIndexSelect.addEventListener("change", refreshPayload);
 
-    sendBtn.addEventListener("click", () => {
-      const payload = buildPayload();
-      // Ini placeholder: nanti ganti dengan kirim ke Firebase/ESP32
-      console.log("SEND PAYLOAD:", payload);
-      alert("Payload siap dikirim!\n\n" + JSON.stringify(payload, null, 2));
+    // ====== WRITE CONTROL TO RTDB ======
+    sendBtn.addEventListener("click", async () => {
+      const p = buildPayload().ac;
+      await set(ref(db, "control/ac"), {
+        power: p.power,
+        mode: p.mode,
+        arah: p.arah,
+        kecepatan: p.kecepatan,
+        suhu_index: p.suhu_index
+      });
+      alert("Control terkirim ke RTDB!");
     });
 
     resetBtn.addEventListener("click", resetUI);
 
-    // ====== DEMO MONITORING (opsional) ======
-    // Biar UI tidak kosong total, ini simulasi nilai berubah.
-    // Hapus blok ini saat sudah pakai data realtime.
-    function demoMonitoring() {
-      let t = 27.0;
-      let p = 1008.0;
-      tempStatus.textContent = "demo";
-      pressStatus.textContent = "demo";
-      setInterval(() => {
-        t += (Math.random() - 0.5) * 0.2;
-        p += (Math.random() - 0.5) * 0.8;
-        tempValue.textContent = t.toFixed(1);
-        pressValue.textContent = p.toFixed(1);
-      }, 1200);
-    }
+    // ====== LISTEN MONITORING ======
+    // onValue akan terpanggil sekali saat listener dipasang dan tiap ada perubahan data. :contentReference[oaicite:10]{index=10}
+    onValue(ref(db, "monitoring/suhu"), (snap) => {
+      const v = snap.val();
+      tempValue.textContent = (v ?? "--");
+      tempMeta.textContent = "realtime";
+      connStatus.textContent = "RTDB: online";
+    }, () => {
+      connStatus.textContent = "RTDB: error";
+    });
+
+    onValue(ref(db, "monitoring/pressure"), (snap) => {
+      const v = snap.val();
+      pressValue.textContent = (v ?? "--");
+      pressMeta.textContent = "realtime";
+    });
+
+    // ====== LISTEN CONTROL (SYNC UI) ======
+    onValue(ref(db, "control/ac"), (snap) => {
+      const d = snap.val();
+      if (!d) return;
+
+      if (d.power === "on" || d.power === "off") setPowerUI(d.power);
+      if (d.mode) modeSelect.value = d.mode;
+      if (d.arah) arahSelect.value = String(d.arah);
+      if (d.kecepatan) speedSelect.value = String(d.kecepatan);
+      if (Number.isInteger(d.suhu_index)) tempIndexSelect.value = String(d.suhu_index);
+
+      refreshPayload();
+    });
 
     // ====== INIT ======
     buildTempOptions();
     resetUI();
-    demoMonitoring(); // hapus jika tidak perlu
+
+    // (Opsional) seed data pertama kali biar node muncul
+    // Kamu boleh hapus kalau nggak mau.
+    update(ref(db), {
+      "monitoring/suhu": 0,
+      "monitoring/pressure": 0
+    });
   </script>
 </body>
 </html>
