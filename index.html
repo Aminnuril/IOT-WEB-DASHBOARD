@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>IoT AC Dashboard</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --panel-2:#0b1220;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22c55e;
+      --accent-2:#38bdf8;
+      --danger:#ef4444;
+      --border:rgba(255,255,255,.08);
+      --shadow:0 10px 30px rgba(0,0,0,.25);
+      --radius:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(56,189,248,.12), transparent),
+                  radial-gradient(1200px 600px at 90% 10%, rgba(34,197,94,.12), transparent),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding:28px;
+    }
+    header{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    .title{
+      display:flex; flex-direction:column; gap:4px;
+    }
+    h1{
+      font-size: clamp(20px, 3vw, 28px);
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .container{
+      display:grid;
+      grid-template-columns: 1.1fr 1.4fr;
+      gap:18px;
+    }
+    @media (max-width: 980px){
+      .container{grid-template-columns: 1fr;}
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%),
+                  var(--panel);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      padding:18px;
+      box-shadow: var(--shadow);
+    }
+    .panel h2{
+      margin:0 0 12px 0;
+      font-size:16px;
+      color:#f3f4f6;
+      letter-spacing:.2px;
+    }
+
+    /* Monitoring cards */
+    .metrics{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 520px){
+      .metrics{grid-template-columns: 1fr;}
+    }
+    .metric-card{
+      background: var(--panel-2);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .metric-label{
+      color:var(--muted);
+      font-size:12px;
+    }
+    .metric-value{
+      font-size:28px;
+      font-weight:700;
+      letter-spacing:.3px;
+      display:flex;
+      align-items:baseline;
+      gap:6px;
+    }
+    .unit{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:500;
+    }
+
+    /* Control layout */
+    .section{
+      padding:12px;
+      background: var(--panel-2);
+      border:1px solid var(--border);
+      border-radius:14px;
+      margin-bottom:12px;
+    }
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 680px){
+      .grid-2{grid-template-columns: 1fr;}
+    }
+
+    label{
+      display:block;
+      font-size:11px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    select, input[type="number"], input[type="text"]{
+      width:100%;
+      background:#0b1020;
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:10px 10px;
+      border-radius:10px;
+      outline:none;
+    }
+    select:focus, input:focus{
+      border-color: rgba(56,189,248,.45);
+      box-shadow: 0 0 0 3px rgba(56,189,248,.12);
+    }
+
+    /* Power buttons */
+    .power-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      border:1px solid var(--border);
+      background:#0b1020;
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:10px;
+      font-weight:600;
+      font-size:12px;
+      cursor:pointer;
+      transition:.15s ease;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-1px)}
+    .btn:active{transform: translateY(0)}
+    .btn-on.active{
+      border-color: rgba(34,197,94,.55);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.15);
+      background: rgba(34,197,94,.08);
+    }
+    .btn-off.active{
+      border-color: rgba(239,68,68,.55);
+      box-shadow: 0 0 0 3px rgba(239,68,68,.12);
+      background: rgba(239,68,68,.08);
+    }
+
+    /* Submit area */
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-start;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .btn-primary{
+      background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(34,197,94,.18));
+      border-color: rgba(255,255,255,.14);
+    }
+    .btn-secondary{
+      color:var(--muted);
+    }
+
+    /* Payload preview */
+    pre{
+      margin:0;
+      background:#050814;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:12px;
+      font-size:11px;
+      color:#d1fae5;
+      overflow:auto;
+    }
+    .tiny-muted{
+      font-size:10px;
+      color:var(--muted);
+      margin-top:6px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="title">
+      <h1>Dashboard Monitoring & Control AC</h1>
+      <div class="subtitle">UI statis — siap dihubungkan ke ESP32/Firebase/REST/MQTT</div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- MONITORING -->
+    <section class="panel">
+      <h2>Monitoring</h2>
+      <div class="metrics">
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">Suhu</div>
+            <div class="metric-value">
+              <span id="tempValue">--</span>
+              <span class="unit">°C</span>
+            </div>
+          </div>
+          <div class="unit" id="tempStatus">waiting...</div>
+        </div>
+
+        <div class="metric-card">
+          <div>
+            <div class="metric-label">Pressure</div>
+            <div class="metric-value">
+              <span id="pressValue">--</span>
+              <span class="unit">hPa</span>
+            </div>
+          </div>
+          <div class="unit" id="pressStatus">waiting...</div>
+        </div>
+      </div>
+
+      <div class="tiny-muted">
+        *Nanti kamu bisa update nilai ini dari realtime listener Firebase/WS/HTTP.
+      </div>
+    </section>
+
+    <!-- CONTROL -->
+    <section class="panel">
+      <h2>Control - AC</h2>
+
+      <div class="section">
+        <label>POWER</label>
+        <div class="power-row">
+          <button class="btn btn-on active" id="powerOnBtn" type="button">ON</button>
+          <button class="btn btn-off" id="powerOffBtn" type="button">OFF</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="grid-2">
+          <div>
+            <label for="modeSelect">MODE</label>
+            <select id="modeSelect">
+              <option value="dry">dry</option>
+              <option value="fan">fan</option>
+              <option value="auto" selected>auto</option>
+              <option value="cool">cool</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="arahSelect">ARAH</label>
+            <select id="arahSelect">
+              <option value="all">54321 / semua arah</option>
+              <option value="auto" selected>auto</option>
+              <option value="5">5 (atas sendiri)</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="1">1 (bawah sendiri)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="speedSelect">KECEPATAN</label>
+            <select id="speedSelect">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="auto" selected>auto</option>
+              <option value="semilir">semilir</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="tempIndexSelect">SUHU (Index)</label>
+            <select id="tempIndexSelect"></select>
+          </div>
+        </div>
+
+        <div class="tiny-muted">
+          Mapping suhu: <b>index 0 = 14.0°C</b>, naik <b>step 0.5°C</b> (contoh index 1 = 14.5°C).
+        </div>
+      </div>
+
+      <div class="section">
+        <label>Payload Preview</label>
+        <pre id="payloadPreview">{}</pre>
+        <div class="tiny-muted">
+          Format ini bisa kamu kirim ke ESP32 atau simpan ke Firebase.
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="sendBtn" type="button">Kirim Control</button>
+        <button class="btn btn-secondary" id="resetBtn" type="button">Reset UI</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ====== CONFIG SUHU INDEX ======
+    // Range dibuat 0..32 agar 14.0 s/d 30.0 (step 0.5)
+    const TEMP_MIN = 14.0;
+    const TEMP_STEP = 0.5;
+    const TEMP_MAX = 30.0;
+    const MAX_INDEX = Math.round((TEMP_MAX - TEMP_MIN) / TEMP_STEP); // 32
+
+    // ====== ELEMENTS ======
+    const tempIndexSelect = document.getElementById("tempIndexSelect");
+    const modeSelect = document.getElementById("modeSelect");
+    const arahSelect = document.getElementById("arahSelect");
+    const speedSelect = document.getElementById("speedSelect");
+    const payloadPreview = document.getElementById("payloadPreview");
+
+    const powerOnBtn = document.getElementById("powerOnBtn");
+    const powerOffBtn = document.getElementById("powerOffBtn");
+
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // Monitoring placeholders
+    const tempValue = document.getElementById("tempValue");
+    const pressValue = document.getElementById("pressValue");
+    const tempStatus = document.getElementById("tempStatus");
+    const pressStatus = document.getElementById("pressStatus");
+
+    // ====== STATE ======
+    let powerState = "on"; // default ON
+
+    // ====== BUILD TEMP INDEX OPTIONS ======
+    function buildTempOptions() {
+      tempIndexSelect.innerHTML = "";
+      for (let i = 0; i <= MAX_INDEX; i++) {
+        const temp = (TEMP_MIN + i * TEMP_STEP).toFixed(1);
+        const opt = document.createElement("option");
+        opt.value = String(i);
+        opt.textContent = `${i} = ${temp}°C`;
+        tempIndexSelect.appendChild(opt);
+      }
+      // default: set index yang nyaman, misal 24.0°C
+      const defaultIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
+      tempIndexSelect.value = String(Math.max(0, Math.min(MAX_INDEX, defaultIndex)));
+    }
+
+    // ====== UI HELPERS ======
+    function setPower(state) {
+      powerState = state;
+      powerOnBtn.classList.toggle("active", state === "on");
+      powerOffBtn.classList.toggle("active", state === "off");
+      refreshPayload();
+    }
+
+    function getTempByIndex(idx) {
+      const i = Number(idx);
+      return Number((TEMP_MIN + i * TEMP_STEP).toFixed(1));
+    }
+
+    function buildPayload() {
+      const tempIndex = Number(tempIndexSelect.value);
+      return {
+        ac: {
+          power: powerState,               // "on" | "off"
+          mode: modeSelect.value,          // "dry" | "fan" | "auto" | "cool"
+          arah: arahSelect.value,          // "all" | "auto" | "5".."1"
+          kecepatan: speedSelect.value,    // "1".."4" | "auto" | "semilir"
+          suhu_index: tempIndex,           // integer
+          suhu_value: getTempByIndex(tempIndex) // float helper
+        }
+      };
+    }
+
+    function refreshPayload() {
+      payloadPreview.textContent = JSON.stringify(buildPayload(), null, 2);
+    }
+
+    function resetUI() {
+      setPower("on");
+      modeSelect.value = "auto";
+      arahSelect.value = "auto";
+      speedSelect.value = "auto";
+      const defaultIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
+      tempIndexSelect.value = String(defaultIndex);
+      refreshPayload();
+    }
+
+    // ====== EVENT BINDINGS ======
+    powerOnBtn.addEventListener("click", () => setPower("on"));
+    powerOffBtn.addEventListener("click", () => setPower("off"));
+
+    modeSelect.addEventListener("change", refreshPayload);
+    arahSelect.addEventListener("change", refreshPayload);
+    speedSelect.addEventListener("change", refreshPayload);
+    tempIndexSelect.addEventListener("change", refreshPayload);
+
+    sendBtn.addEventListener("click", () => {
+      const payload = buildPayload();
+      // Ini placeholder: nanti ganti dengan kirim ke Firebase/ESP32
+      console.log("SEND PAYLOAD:", payload);
+      alert("Payload siap dikirim!\n\n" + JSON.stringify(payload, null, 2));
+    });
+
+    resetBtn.addEventListener("click", resetUI);
+
+    // ====== DEMO MONITORING (opsional) ======
+    // Biar UI tidak kosong total, ini simulasi nilai berubah.
+    // Hapus blok ini saat sudah pakai data realtime.
+    function demoMonitoring() {
+      let t = 27.0;
+      let p = 1008.0;
+      tempStatus.textContent = "demo";
+      pressStatus.textContent = "demo";
+      setInterval(() => {
+        t += (Math.random() - 0.5) * 0.2;
+        p += (Math.random() - 0.5) * 0.8;
+        tempValue.textContent = t.toFixed(1);
+        pressValue.textContent = p.toFixed(1);
+      }, 1200);
+    }
+
+    // ====== INIT ======
+    buildTempOptions();
+    resetUI();
+    demoMonitoring(); // hapus jika tidak perlu
+  </script>
+</body>
+</html>
