@@ -17,10 +17,10 @@ const db = firebase.database();
 const sensorRef = db.ref('sensor');
 const acRef = db.ref('ac');
 
-// Generate pilihan suhu (14.0 - 24.0, step 0.5)
+// Generate pilihan suhu (step 0.5)
 function generateTempOptions() {
   const select = document.getElementById('temp-index-select');
-  for (let i = 0; i <= 20; i++) {
+  for (let i = 0; i <= 24; i++) { // n index -> 14.0 + n*0.5 = x
     const temp = 14.0 + i * 0.5;
     const option = document.createElement('option');
     option.value = i;
