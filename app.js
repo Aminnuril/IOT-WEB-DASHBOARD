@@ -1,12 +1,13 @@
 // Inisialisasi Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // GANTI DENGAN API KEY ANDA
-  authDomain: "your-project.firebaseapp.com",
-  databaseURL: "https://your-project-default-rtdb.firebaseio.com",
-  projectId: "your-project",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "YOUR_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBh2T-GLXopRlv1uTcWXQvLt_iDJlnMsqo",
+  authDomain: "webiotdashboard.firebaseapp.com",
+  databaseURL: "https://webiotdashboard-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "webiotdashboard",
+  storageBucket: "webiotdashboard.firebasestorage.app",
+  messagingSenderId: "38054663986",
+  appId: "1:38054663986:web:d53a0ec9898609f013692b",
+  measurementId: "G-STF6WDKYFB"
 };
 
 firebase.initializeApp(firebaseConfig);
