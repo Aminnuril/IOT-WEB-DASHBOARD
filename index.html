@@ -1,395 +1,87 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>IOT WEB DASHBOARD - AC (RTDB)</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard AC Realtime</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
-    :root{
-      --bg:#0f172a;
-      --panel:#111827;
-      --panel2:#0b1220;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --border:rgba(255,255,255,.08);
-      --good:#22c55e;
-      --bad:#ef4444;
-      --radius:16px;
-      --shadow:0 10px 30px rgba(0,0,0,.25);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; padding:26px;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background:
-        radial-gradient(900px 500px at 10% -10%, rgba(34,197,94,.12), transparent),
-        radial-gradient(900px 500px at 90% 10%, rgba(56,189,248,.12), transparent),
-        var(--bg);
-      color:var(--text);
-      min-height:100vh;
-    }
-    header{
-      display:flex; align-items:flex-end; justify-content:space-between;
-      gap:12px; margin-bottom:14px;
-    }
-    h1{margin:0; font-size:clamp(20px,3vw,28px)}
-    .sub{color:var(--muted); font-size:12px}
-
-    .pill{
-      font-size:10px; color:var(--muted);
-      border:1px solid var(--border);
-      padding:4px 8px; border-radius:999px;
-      background: rgba(255,255,255,.02);
-    }
-
-    .container{
-      display:grid; grid-template-columns: 1.1fr 1.4fr; gap:16px;
-    }
-    @media (max-width: 980px){ .container{grid-template-columns:1fr;} }
-
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 40%), var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:16px; box-shadow:var(--shadow);
-    }
-    .panel h2{margin:0 0 10px 0; font-size:16px}
-
-    .metrics{
-      display:grid; grid-template-columns:1fr 1fr; gap:10px;
-    }
-    @media (max-width: 520px){ .metrics{grid-template-columns:1fr;} }
-
-    .metric{
-      background:var(--panel2);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px;
-      display:flex; justify-content:space-between; align-items:center;
-    }
-    .label{color:var(--muted); font-size:11px}
-    .value{font-size:28px; font-weight:700}
-    .unit{color:var(--muted); font-size:11px}
-
-    .section{
-      background:var(--panel2);
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:12px;
-      margin-bottom:10px;
-    }
-
-    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    @media (max-width: 680px){ .grid2{grid-template-columns:1fr;} }
-
-    label{display:block; font-size:11px; color:var(--muted); margin-bottom:6px;}
-
-    select{
-      width:100%;
-      background:#0b1020;
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:10px;
-      outline:none;
-    }
-
-    .power-row{display:flex; gap:8px; flex-wrap:wrap;}
-    .btn{
-      background:#0b1020; color:var(--text);
-      border:1px solid var(--border);
-      border-radius:10px;
-      padding:9px 12px;
-      font-size:12px; font-weight:600;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-    .btn:hover{transform:translateY(-1px)}
-    .btn.on.active{border-color:rgba(34,197,94,.55); background:rgba(34,197,94,.08)}
-    .btn.off.active{border-color:rgba(239,68,68,.55); background:rgba(239,68,68,.08)}
-
-    .actions{display:flex; gap:8px; flex-wrap:wrap;}
-
-    .primary{
-      background: linear-gradient(90deg, rgba(56,189,248,.18), rgba(34,197,94,.18));
-    }
-
-    pre{
-      background:#050814;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:10px;
-      margin:0;
-      font-size:11px;
-      color:#d1fae5;
-      overflow:auto;
-    }
-    code{font-size:11px}
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    h2 { color: #333; }
+    .sensor-display { font-size: 24px; font-weight: bold; color: #007BFF; }
+    button, select { padding: 8px; margin: 5px; }
+    .control-btn { background: #28a745; color: white; border: none; cursor: pointer; }
+    .control-btn:hover { background: #218838; }
+    .toggle-btn { width: 80px; }
   </style>
 </head>
 <body>
-  <header>
-    <div>
-      <h1>Dashboard Monitoring & Control AC</h1>
-      <div class="sub">Firebase RTDB + GitHub Pages</div>
-    </div>
-    <div class="pill" id="connPill">RTDB: checking...</div>
-  </header>
 
-  <div class="container">
-    <!-- MONITORING -->
-    <section class="panel">
-      <h2>Monitoring</h2>
-      <div class="metrics">
-        <div class="metric">
-          <div>
-            <div class="label">Suhu</div>
-            <div class="value"><span id="tempValue">--</span> <span class="unit">°C</span></div>
-          </div>
-          <div class="unit" id="tempMeta">monitoring/suhu</div>
-        </div>
-        <div class="metric">
-          <div>
-            <div class="label">Pressure</div>
-            <div class="value"><span id="pressValue">--</span> <span class="unit">hPa</span></div>
-          </div>
-          <div class="unit" id="pressMeta">monitoring/pressure</div>
-        </div>
-      </div>
-      <div class="sub" style="margin-top:8px;">
-        Path: <code>monitoring/suhu</code> & <code>monitoring/pressure</code>
-      </div>
-    </section>
+  <h1>🎯 Dashboard AC Realtime</h1>
 
-    <!-- CONTROL -->
-    <section class="panel">
-      <h2>Control - AC</h2>
-
-      <div class="section">
-        <label>POWER</label>
-        <div class="power-row">
-          <button class="btn on active" id="powerOnBtn" type="button">ON</button>
-          <button class="btn off" id="powerOffBtn" type="button">OFF</button>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="grid2">
-          <div>
-            <label for="modeSelect">MODE</label>
-            <select id="modeSelect">
-              <option value="dry">dry</option>
-              <option value="fan">fan</option>
-              <option value="auto" selected>auto</option>
-              <option value="cool">cool</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="arahSelect">ARAH</label>
-            <select id="arahSelect">
-              <option value="all">54321 / semua arah</option>
-              <option value="auto" selected>auto</option>
-              <option value="5">5 (atas sendiri)</option>
-              <option value="4">4</option>
-              <option value="3">3</option>
-              <option value="2">2</option>
-              <option value="1">1 (bawah sendiri)</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="speedSelect">KECEPATAN</label>
-            <select id="speedSelect">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="auto" selected>auto</option>
-              <option value="semilir">semilir</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="tempIndexSelect">SUHU (Index)</label>
-            <select id="tempIndexSelect"></select>
-          </div>
-        </div>
-        <div class="sub" style="margin-top:6px;">
-          Index 0=14.0°C, step 0.5°C.
-        </div>
-      </div>
-
-      <div class="section">
-        <label>Payload Preview</label>
-        <pre id="payloadPreview">{}</pre>
-      </div>
-
-      <div class="actions">
-        <button class="btn primary" id="sendBtn" type="button">Kirim Control</button>
-        <button class="btn" id="resetBtn" type="button">Reset UI</button>
-      </div>
-
-      <div class="sub" style="margin-top:8px;">
-        Path write: <code>control/ac</code>
-      </div>
-    </section>
+  <!-- Monitoring Section -->
+  <div class="section">
+    <h2>📊 Monitoring</h2>
+    <p>Suhu: <span id="temp-display" class="sensor-display">--°C</span></p>
+    <p>Tekanan: <span id="press-display" class="sensor-display">-- hPa</span></p>
   </div>
 
-  <script type="module">
-    // ========= Firebase ESM CDN (WAJIB untuk GitHub Pages) =========
-    //const VERSION = "10.12.2";
-    import { initializeApp } from `https://www.gstatic.com/firebasejs/${VERSION}/firebase-app.js`;
-    import { getDatabase, ref, onValue, set } from `https://www.gstatic.com/firebasejs/${VERSION}/firebase-database.js`;
+  <!-- Control Section -->
+  <div class="section">
+    <h2>⚙️ Control AC</h2>
 
-    // ========= 1) PASTE firebaseConfig ASLI KAMU DI SINI =========
-    // Ambil dari Firebase Console > Project settings > Your apps > Web app
-    const firebaseConfig = {
-      apiKey: "AIzaSyBh2T-GLXopRlv1uTcWXQvLt_iDJlnMsqo",
-      authDomain: "webiotdashboard.firebaseapp.com",
-      databaseURL: "https://webiotdashboard-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "webiotdashboard",
-      storageBucket: "webiotdashboard.firebasestorage.app",
-      messagingSenderId: "38054663986",
-      appId: "1:38054663986:web:d53a0ec9898609f013692b",
-      measurementId: "G-STF6WDKYFB"
-    };
+    <div>
+      <label>POWER:</label>
+      <button id="power-on" class="control-btn toggle-btn">ON</button>
+      <button id="power-off" class="control-btn toggle-btn">OFF</button>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    <div>
+      <label>MODE:</label>
+      <select id="mode-select">
+        <option value="dry">Dry</option>
+        <option value="fan">Fan</option>
+        <option value="auto">Auto</option>
+        <option value="cool" selected>Cool</option>
+      </select>
+    </div>
 
-    // ========= UI Elements =========
-    const connPill = document.getElementById("connPill");
+    <div>
+      <label>ARAH:</label>
+      <select id="direction-select">
+        <option value="all">Semua Arah</option>
+        <option value="auto">Auto</option>
+        <option value="5">5</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+        <option value="1">1</option>
+      </select>
+    </div>
 
-    const tempValue = document.getElementById("tempValue");
-    const pressValue = document.getElementById("pressValue");
+    <div>
+      <label>KECEPATAN:</label>
+      <select id="speed-select">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="auto" selected>Auto</option>
+        <option value="semilir">Semilir</option>
+      </select>
+    </div>
 
-    const powerOnBtn = document.getElementById("powerOnBtn");
-    const powerOffBtn = document.getElementById("powerOffBtn");
-    const modeSelect = document.getElementById("modeSelect");
-    const arahSelect = document.getElementById("arahSelect");
-    const speedSelect = document.getElementById("speedSelect");
-    const tempIndexSelect = document.getElementById("tempIndexSelect");
-    const payloadPreview = document.getElementById("payloadPreview");
+    <div>
+      <label>SUHU:</label>
+      <select id="temp-index-select">
+        <!-- Diisi via JS -->
+      </select>
+    </div>
 
-    const sendBtn = document.getElementById("sendBtn");
-    const resetBtn = document.getElementById("resetBtn");
+  </div>
 
-    // ========= Suhu Index =========
-    const TEMP_MIN = 14.0;
-    const TEMP_STEP = 0.5;
-    const TEMP_MAX = 30.0;
-    const MAX_INDEX = Math.round((TEMP_MAX - TEMP_MIN) / TEMP_STEP); // 32
-
-    function buildTempOptions(){
-      tempIndexSelect.innerHTML = "";
-      for(let i=0;i<=MAX_INDEX;i++){
-        const t = (TEMP_MIN + i*TEMP_STEP).toFixed(1);
-        const opt = document.createElement("option");
-        opt.value = String(i);
-        opt.textContent = `${i} = ${t}°C`;
-        tempIndexSelect.appendChild(opt);
-      }
-    }
-
-    let powerState = "on";
-
-    function setPowerUI(state){
-      powerState = state === "off" ? "off" : "on";
-      powerOnBtn.classList.toggle("active", powerState === "on");
-      powerOffBtn.classList.toggle("active", powerState === "off");
-    }
-
-    function tempByIndex(i){
-      return Number((TEMP_MIN + Number(i)*TEMP_STEP).toFixed(1));
-    }
-
-    function buildPayload(){
-      const idx = Number(tempIndexSelect.value ?? 0);
-      return {
-        ac: {
-          power: powerState,
-          mode: modeSelect.value,
-          arah: arahSelect.value,
-          kecepatan: speedSelect.value,
-          suhu_index: idx,
-          suhu_value: tempByIndex(idx)
-        }
-      };
-    }
-
-    function refreshPayload(){
-      payloadPreview.textContent = JSON.stringify(buildPayload(), null, 2);
-    }
-
-    function resetUI(){
-      setPowerUI("on");
-      modeSelect.value = "auto";
-      arahSelect.value = "auto";
-      speedSelect.value = "auto";
-      const defIndex = Math.round((24.0 - TEMP_MIN) / TEMP_STEP);
-      tempIndexSelect.value = String(defIndex);
-      refreshPayload();
-    }
-
-    // ========= UI Events =========
-    powerOnBtn.addEventListener("click", () => { setPowerUI("on"); refreshPayload(); });
-    powerOffBtn.addEventListener("click", () => { setPowerUI("off"); refreshPayload(); });
-    modeSelect.addEventListener("change", refreshPayload);
-    arahSelect.addEventListener("change", refreshPayload);
-    speedSelect.addEventListener("change", refreshPayload);
-    tempIndexSelect.addEventListener("change", refreshPayload);
-
-    sendBtn.addEventListener("click", async () => {
-      const p = buildPayload().ac;
-      // Match key kamu: arah, kecepatan, mode, power, suhu_index
-      await set(ref(db, "control/ac"), {
-        arah: String(p.arah),
-        kecepatan: String(p.kecepatan),
-        mode: String(p.mode),
-        power: String(p.power),
-        suhu_index: Number(p.suhu_index)
-      });
-      alert("Control terkirim ke RTDB!");
-    });
-
-    resetBtn.addEventListener("click", resetUI);
-
-    // ========= Realtime Listeners =========
-    // Monitoring
-    onValue(ref(db, "monitoring/suhu"), (snap) => {
-      const v = snap.val();
-      tempValue.textContent = (v ?? "--");
-    });
-
-    onValue(ref(db, "monitoring/pressure"), (snap) => {
-      const v = snap.val();
-      pressValue.textContent = (v ?? "--");
-    });
-
-    // Control sync -> UI
-    onValue(ref(db, "control/ac"), (snap) => {
-      const d = snap.val();
-      if(!d) return;
-
-      if(d.power) setPowerUI(d.power);
-      if(d.mode) modeSelect.value = d.mode;
-      if(d.arah) arahSelect.value = String(d.arah);
-      if(d.kecepatan) speedSelect.value = String(d.kecepatan);
-      if(Number.isInteger(d.suhu_index)) tempIndexSelect.value = String(d.suhu_index);
-
-      refreshPayload();
-    });
-
-    // Status koneksi sederhana
-    onValue(ref(db, ".info/connected"), (snap) => {
-      const ok = !!snap.val();
-      connPill.textContent = ok ? "RTDB: online" : "RTDB: offline";
-    });
-
-    // ========= Init =========
-    buildTempOptions();
-    resetUI();
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>
