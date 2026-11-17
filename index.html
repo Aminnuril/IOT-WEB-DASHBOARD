@@ -3,220 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>❄️ Dashboard AC - Realtime</title>
+  <title>❄️ Dashboard AC Daikin152 - Realtime</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --text: #f1f5f9;
-      --accent: #38bdf8;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --border: #334155;
+      --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --accent: #38bdf8;
+      --success: #10b981; --danger: #ef4444; --border: #334155;
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      padding: 20px;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    h1 {
-      font-size: 28px;
-      background: linear-gradient(90deg, var(--accent), #818cf8);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      color: #94a3b8;
-      margin-top: 8px;
-    }
-
-    .online::before {
-      content: "🟢";
-      margin-right: 4px;
-    }
-    .offline::before {
-      content: "🔴";
-      margin-right: 4px;
-    }
-
-    .section {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-
-    .section h2 {
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .sensor-row {
-      display: flex;
-      justify-content: space-around;
-      margin: 16px 0;
-    }
-
-    .sensor-box {
-      text-align: center;
-    }
-
-    .sensor-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: var(--accent);
-      margin: 8px 0;
-    }
-
-    .control-group {
-      margin: 16px 0;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    select, .power-btn-group {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      background: #334155;
-      color: white;
-      border: 1px solid var(--border);
-      margin-top: 4px;
-    }
-
-    select:focus {
-      outline: 2px solid var(--accent);
-    }
-
-    .power-btn-group {
-      display: flex;
-      gap: 10px;
-    }
-
-    .power-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .power-on {
-      background: var(--success);
-    }
-    .power-on:hover {
-      background: #0da271;
-    }
-    .power-off {
-      background: var(--danger);
-    }
-    .power-off:hover {
-      background: #dc2626;
-    }
-
-    .power-on.active {
-      transform: scale(1.05);
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.5);
-    }
-    .power-off.active {
-      transform: scale(1.05);
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
-    }
-
-    /* Toast Notification */
-    #toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #0f172a;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 8px;
-      border-left: 4px solid var(--accent);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s;
-      z-index: 1000;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Loading spinner untuk feedback */
-    .loading::after {
-      content: " ⏳";
-    }
-
-    /* Responsif */
-    @media (max-width: 600px) {
-      .sensor-row {
-        flex-direction: column;
-        gap: 16px;
-      }
-      h1 {
-        font-size: 24px;
-      }
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 24px; }
+    h1 { font-size: 28px; background: linear-gradient(90deg, var(--accent), #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+    .status-bar { display: flex; justify-content: space-between; font-size: 14px; color: #94a3b8; margin-top: 8px; }
+    .online::before { content: "🟢 "; } .offline::before { content: "🔴 "; }
+    .section { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); }
+    .section h2 { margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .sensor-row { display: flex; justify-content: space-around; margin: 16px 0; }
+    .sensor-box { text-align: center; }
+    .sensor-value { font-size: 28px; font-weight: bold; color: var(--accent); margin: 8px 0; }
+    .control-group { margin: 16px 0; }
+    label { display: block; margin-bottom: 8px; font-weight: 600; }
+    select, .power-btn-group { width: 100%; padding: 10px; border-radius: 8px; background: #334155; color: white; border: 1px solid var(--border); margin-top: 4px; }
+    select:focus { outline: 2px solid var(--accent); }
+    .power-btn-group { display: flex; gap: 10px; }
+    .power-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+    .power-on { background: var(--success); } .power-off { background: var(--danger); }
+    .power-on.active { transform: scale(1.05); box-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+    .power-off.active { transform: scale(1.05); box-shadow: 0 0 12px rgba(239, 68, 68, 0.5); }
+    #toast { position: fixed; bottom: 20px; right: 20px; background: #0f172a; color: white; padding: 12px 20px; border-radius: 8px; border-left: 4px solid var(--accent); opacity: 0; transform: translateY(20px); transition: all 0.3s; z-index: 1000; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    .loading::after { content: " ⏳"; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>❄️ Dashboard AC Realtime</h1>
+      <h1>❄️ Dashboard AC Daikin152</h1>
       <div class="status-bar">
         <span id="connection-status" class="offline">Offline</span>
         <span id="last-update">Belum pernah update</span>
       </div>
     </header>
 
-    <!-- Monitoring -->
     <div class="section">
       <h2>📊 Monitoring Lingkungan</h2>
       <div class="sensor-row">
         <div class="sensor-box">
-          <div>🌡️ Suhu</div>
+          <div>🌡️ Suhu Ruangan</div>
           <div id="temp-display" class="sensor-value">--°C</div>
         </div>
         <div class="sensor-box">
@@ -226,9 +61,8 @@
       </div>
     </div>
 
-    <!-- Control AC -->
     <div class="section">
-      <h2>🎛️ Kontrol AC</h2>
+      <h2>🎛️ Kontrol AC Daikin</h2>
 
       <div class="control-group">
         <label>⚡ POWER</label>
@@ -241,50 +75,47 @@
       <div class="control-group">
         <label>🌀 MODE</label>
         <select id="mode-select">
-          <option value="dry">Dry</option>
-          <option value="fan">Fan</option>
-          <option value="auto">Auto</option>
-          <option value="cool">Cool</option>
+          <option value="cool">Cool (Dingin)</option>
+          <option value="dry">Dry (Pengering)</option>
+          <option value="fan">Fan (Kipas Saja)</option>
+          <option value="auto">Auto (Otomatis)</option>
+          <option value="heat">Heat (Pemanas)</option>
         </select>
       </div>
 
       <div class="control-group">
-        <label>🧭 ARAH KIPAS</label>
-        <select id="direction-select">
-          <option value="all">Semua Arah</option>
-          <option value="auto">Auto</option>
-          <option value="5">5</option>
-          <option value="4">4</option>
-          <option value="3">3</option>
-          <option value="2">2</option>
-          <option value="1">1</option>
+        <label>🌡️ SUHU TARGET (°C)</label>
+        <select id="temp-select">
+          <!-- Opsi suhu standar AC 16°C - 32°C -->
         </select>
       </div>
 
       <div class="control-group">
-        <label>💨 KECEPATAN</label>
-        <select id="speed-select">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
+        <label>💨 KECEPATAN KIPAS (FAN SPEED)</label>
+        <select id="fan-select">
           <option value="auto">Auto</option>
-          <option value="semilir">Semilir</option>
+          <option value="min">Min (Pelan)</option>
+          <option value="med">Medium (Sedang)</option>
+          <option value="max">Max (Kencang)</option>
+          <option value="quiet">Quiet (Tenang)</option>
         </select>
       </div>
 
       <div class="control-group">
-        <label>🌡️ SUHU TARGET</label>
-        <select id="temp-index-select"></select>
+        <label>🧭 SWING VERTIKAL (AIRFLOW)</label>
+        <select id="swing-select">
+          <option value="auto">Auto (Ayun Otomatis)</option>
+          <option value="off">Off (Diam di Posisi Terakhir)</option>
+          <option value="up">Up (Paling Atas)</option>
+          <option value="down">Down (Paling Bawah)</option>
+        </select>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
   <div id="toast">Perintah terkirim!</div>
 
   <script>
-    // === FIREBASE CONFIG (GANTI DENGAN MILIK ANDA) ===
     const firebaseConfig = {
       apiKey: "AIzaSyBh2T-GLXopRlv1uTcWXQvLt_iDJlnMsqo",
       authDomain: "webiotdashboard.firebaseapp.com",
@@ -302,20 +133,18 @@
     const sensorRef = db.ref('sensor');
     const connRef = db.ref('.info/connected');
 
-    // === GENERATE SUHU ===
+    // Generate pilihan suhu 16 - 32 °C
     function generateTempOptions() {
-      const select = document.getElementById('temp-index-select');
-      for (let i = 0; i <= 24; i++) {
-        const temp = 14.0 + i * 0.5;
+      const select = document.getElementById('temp-select');
+      for (let t = 16; t <= 32; t++) {
         const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${temp.toFixed(1)}°C`;
+        opt.value = t;
+        opt.textContent = `${t}°C`;
         select.appendChild(opt);
       }
     }
     generateTempOptions();
 
-    // === TOAST ===
     function showToast(msg = "Perintah terkirim!") {
       const toast = document.getElementById('toast');
       toast.textContent = msg;
@@ -323,15 +152,14 @@
       setTimeout(() => toast.classList.remove('show'), 2000);
     }
 
-    // === UPDATE UI DARI FIREBASE ===
     function syncUI(snapshot) {
       const ac = snapshot.val();
       if (!ac) return;
 
       document.getElementById('mode-select').value = ac.mode || 'cool';
-      document.getElementById('direction-select').value = ac.direction || 'auto';
-      document.getElementById('speed-select').value = ac.speed || 'auto';
-      document.getElementById('temp-index-select').value = ac.temperature_index != null ? ac.temperature_index : 12;
+      document.getElementById('temp-select').value = ac.temp || 24;
+      document.getElementById('fan-select').value = ac.fan || 'auto';
+      document.getElementById('swing-select').value = ac.swing || 'auto';
 
       const powerOn = document.getElementById('power-on');
       const powerOff = document.getElementById('power-off');
@@ -342,12 +170,8 @@
         powerOn.classList.remove('active');
         powerOff.classList.add('active');
       }
-
-      // Update last update time
-      document.getElementById('last-update').textContent = `Terakhir: ${new Date().toLocaleTimeString()}`;
     }
 
-    // === SENSOR UPDATE ===
     sensorRef.on('value', (snap) => {
       const s = snap.val();
       if (s) {
@@ -357,36 +181,27 @@
       }
     });
 
-    // === REALTIME AC SYNC ===
-    acRef.on('value', syncUI, (err) => console.error("Gagal baca AC:", err));
+    acRef.on('value', syncUI);
 
-    // === KIRIM PERINTAH ===
     function sendCommand(field, value) {
-      const btn = event?.target;
-      if (btn) btn.classList.add('loading');
       acRef.update({ [field]: value }).then(() => {
-        if (btn) btn.classList.remove('loading');
-        showToast(`✅ ${field}: ${value}`);
+        showToast(`✅ ${field} diubah ke ${value}`);
       });
     }
 
-    // === EVENT LISTENERS ===
     document.getElementById('power-on').addEventListener('click', () => sendCommand('power', true));
     document.getElementById('power-off').addEventListener('click', () => sendCommand('power', false));
     document.getElementById('mode-select').addEventListener('change', (e) => sendCommand('mode', e.target.value));
-    document.getElementById('direction-select').addEventListener('change', (e) => sendCommand('direction', e.target.value));
-    document.getElementById('speed-select').addEventListener('change', (e) => sendCommand('speed', e.target.value));
-    document.getElementById('temp-index-select').addEventListener('change', (e) => sendCommand('temperature_index', parseInt(e.target.value)));
+    document.getElementById('temp-select').addEventListener('change', (e) => sendCommand('temp', parseInt(e.target.value)));
+    document.getElementById('fan-select').addEventListener('change', (e) => sendCommand('fan', e.target.value));
+    document.getElementById('swing-select').addEventListener('change', (e) => sendCommand('swing', e.target.value));
 
-    // === STATUS KONEKSI ===
     connRef.on('value', (snap) => {
       const status = document.getElementById('connection-status');
       if (snap.val()) {
-        status.className = 'online';
-        status.textContent = 'Online';
+        status.className = 'online'; status.textContent = 'Online';
       } else {
-        status.className = 'offline';
-        status.textContent = 'Offline';
+        status.className = 'offline'; status.textContent = 'Offline';
       }
     });
   </script>
