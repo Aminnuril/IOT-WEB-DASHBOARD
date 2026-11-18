@@ -108,6 +108,16 @@
           <option value="off">Off (Ayunan Mati)</option>
         </select>
       </div>
+
+      <div class="control-group">
+        <label>💡 KECERAHAN LED (PWM)</label>
+        <input type="range" id="led-range" min="0" max="255" value="0" style="width: 100%; cursor: pointer; accent-color: var(--accent);">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-top: 4px;">
+          <span>Mati (0)</span>
+          <span id="led-val">0</span>
+          <span>Maks (255)</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -131,7 +141,6 @@
     const sensorRef = db.ref('sensor');
     const connRef = db.ref('.info/connected');
 
-    // Generate pilihan suhu 16 - 32 °C
     function generateTempOptions() {
       const select = document.getElementById('temp-select');
       for (let t = 16; t <= 32; t++) {
@@ -168,6 +177,10 @@
         powerOn.classList.remove('active');
         powerOff.classList.add('active');
       }
+
+      const brightness = ac.led_brightness != null ? ac.led_brightness : 0;
+      document.getElementById('led-range').value = brightness;
+      document.getElementById('led-val').textContent = brightness;
     }
 
     sensorRef.on('value', (snap) => {
@@ -193,6 +206,12 @@
     document.getElementById('temp-select').addEventListener('change', (e) => sendCommand('temp', parseInt(e.target.value)));
     document.getElementById('fan-select').addEventListener('change', (e) => sendCommand('fan', e.target.value));
     document.getElementById('swing-select').addEventListener('change', (e) => sendCommand('swing', e.target.value));
+
+    document.getElementById('led-range').addEventListener('input', (e) => {
+      const val = parseInt(e.target.value);
+      document.getElementById('led-val').textContent = val;
+      sendCommand('led_brightness', val);
+    });
 
     connRef.on('value', (snap) => {
       const status = document.getElementById('connection-status');
